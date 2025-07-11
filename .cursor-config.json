@@ -1,0 +1,6 @@
+{
+  "pinned_files": [
+    "README.md"
+  ],
+  "custom_instructions": "This is a C-based chess data pipeline. It reads .pgn.zst files from Lichess, converts game positions into FEN format, and outputs a CSV for ML training. Each row is a move with move number, FEN, ELO, and next move in UCI."
+}

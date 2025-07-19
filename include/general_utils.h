@@ -1,6 +1,13 @@
 #ifndef GENERAL_UTILS_H
 #define GENERAL_UTILS_H
 
+#include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
+
 // UCI move representation (e.g., "e2e4", "g8f6")
 typedef struct {
     char from_square[3];  // e.g., "e2"
@@ -36,6 +43,8 @@ enum GameResult {
 
 char *get_termination_string(enum Termination termination);
 char *get_game_result_string(enum GameResult game_result);
+Move *get_move_from_uci(char *uci_move);
+bool string_to_int(const char *str, int *out) ;
 
 
 

@@ -1,8 +1,6 @@
 #ifndef PGN_UTILS_H
 #define PGN_UTILS_H
 
-
-#include <string>
 #include <time.h>
 #include "general_utils.h"
 
@@ -19,11 +17,5 @@ typedef struct {
     enum Termination termination; // can be "Normal", "Time forfeit" , "Abandoned"
     char opening_name[100];
 } PGN;
-
-
-
-
-
-
 
 #endif

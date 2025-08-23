@@ -2,7 +2,21 @@
 #include "fen_utils.h"
 
 
-
+/**
+ * @brief Parses a FEN (Forsyth–Edwards Notation) string and fills a FEN_Board struct.
+ *
+ * This function takes a FEN string describing a chess position and populates the provided
+ * FEN_Board structure with the board state, side to move, castling rights, en passant target,
+ * halfmove clock, and fullmove number.
+ *
+ * @param output Pointer to a FEN_Board struct to be filled. If NULL, memory will be allocated.
+ * @param fen_string Null-terminated string containing the FEN position.
+ * @return true if parsing was successful and the board was filled, false otherwise.
+ *
+ * The function expects the FEN string to be well-formed. If any part is missing or invalid,
+ * the function returns false. If output is NULL, the function will allocate memory for it,
+ * but the caller is responsible for freeing it.
+ */
 bool create_fen_board(FEN_Board *output, char *fen_string) {
     if (fen_string == NULL) {
         return false;
@@ -80,5 +94,66 @@ bool create_fen_board(FEN_Board *output, char *fen_string) {
         return false;
     }
     
+    return true;
+}
+
+/**
+ * @brief Converts a FEN_Board struct to a FEN string.
+ *
+ * This function serializes the board state and metadata from a FEN_Board struct
+ * into a standard FEN string and writes it to the provided output buffer.
+ *
+ * @param board Pointer to the FEN_Board struct to convert.
+ * @param fen_string_out Output buffer to store the resulting FEN string.
+ * @return true if conversion was successful, false otherwise.
+ */
+bool fen_board_to_fen_string(FEN_Board *board, char *fen_string_out){
+    if (board == NULL || fen_string_out == NULL) {
+        return false;
+    }
+    fen_string_out[0] = '\0'; // Initialize output string
+
+    // Convert board to FEN string
+    for (int rank = 7; rank >= 0; rank--) {
+        int empty_count = 0;
+        for (int file = 0; file < 8; file++) {
+            if (board->board[rank][file] == ' ') {
+                empty_count++;
+            } else {
+                if (empty_count > 0) {
+                    sprintf(fen_string_out + strlen(fen_string_out), "%d", empty_count);
+                    empty_count = 0;
+                }
+                strncat(fen_string_out, &board->board[rank][file], 1);
+            }
+        }
+        if (empty_count > 0) {
+            sprintf(fen_string_out + strlen(fen_string_out), "%d", empty_count);
+        }
+        if (rank > 0) {
+            strcat(fen_string_out, "/");
+        }
+    }
+
+    // Append side to move
+    strcat(fen_string_out, board->side_to_move == 0 ? " w " : " b ");
+
+    // Append castling rights
+    strcat(fen_string_out, board->castling_rights);
+    strcat(fen_string_out, " ");
+
+    // Append en passant square
+    if (board->en_passant_square_file != -1 && board->en_passant_square_rank != -1) {
+        sprintf(fen_string_out + strlen(fen_string_out), "%c%d ",
+                board->en_passant_square_file + 'a',
+                board->en_passant_square_rank + 1);
+    } else {
+        strcat(fen_string_out, "- ");
+    }
+
+    // Append halfmove clock and fullmove number
+    sprintf(fen_string_out + strlen(fen_string_out), "%d %d",
+            board->halfmove_clock, board->fullmove_number);
+
     return true;
 }

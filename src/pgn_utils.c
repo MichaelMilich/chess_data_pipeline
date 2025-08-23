@@ -2,6 +2,7 @@
 #include "pgn_utils.h"
 #include <string.h>
 
+// TODO: fix this to actually read the pgn correctly
 PGN *parse_pgn(char *pgn_string) {
     PGN *pgn = (PGN *)malloc(sizeof(PGN));
     pgn->event = "Unknown";

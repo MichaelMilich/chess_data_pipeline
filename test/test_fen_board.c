@@ -176,12 +176,36 @@ void test_castling_rights() {
     printf("✓ All castling rights tests passed!\n\n");
 }
 
+void test_fen_conversion() {
+    printf("Testing FEN conversion...\n");
+
+    // Position after 1. e4 e5 2. f4 h6 3. f5 g5
+    char *en_passant_fen = "rnbqkbnr/pppp1p2/7p/4pPp1/4P3/8/PPPP2PP/RNBQKBNR w KQkq g6 0 4";
+
+    FEN_Board board;
+    bool success = create_fen_board(&board, en_passant_fen);
+
+    assert(success == true);
+    printf("✓ create_fen_board returned true\n");
+
+    char fen_out[200];
+    success = fen_board_to_fen_string(&board, fen_out);
+
+    assert(success == true);
+    assert(strcmp(en_passant_fen, fen_out) == 0);
+    printf("✓ output = %s\n", fen_out);
+    printf("✓ FEN conversion is correct\n");
+
+    print_fen_board(&board);
+}
+
 int main() {
     printf("=== FEN Board Structure Test Suite ===\n\n");
     
     test_starting_position();
     test_en_passant_position();
     test_castling_rights();
+    test_fen_conversion();
     
     printf("🎉 All tests passed successfully!\n");
     return 0;

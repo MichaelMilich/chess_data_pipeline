@@ -14,7 +14,7 @@ OBJ_FILES = $(SRC_FILES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 # Test files
 TEST_FILES = $(wildcard $(TEST_DIR)/*.c)
-TEST_TARGETS = $(TEST_FILES:$(TEST_DIR)/%.c=test_%)
+TEST_TARGETS = $(TEST_FILES:$(TEST_DIR)/%.c=$(OBJ_DIR)/test_%)
 
 # Default target
 all: $(TEST_TARGETS)
@@ -28,16 +28,16 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # Compile test targets
-test_%: $(TEST_DIR)/%.c $(OBJ_FILES)
+$(OBJ_DIR)/test_%: $(TEST_DIR)/%.c $(OBJ_FILES) | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(INCLUDES) $< $(OBJ_FILES) $(LIBS) -o $@
 
 # Test the FEN board functionality
-test_fen: test_test_fen_board
-	./test_test_fen_board
+test_fen: $(OBJ_DIR)/test_test_fen_board
+	./$(OBJ_DIR)/test_test_fen_board
 
 # Clean build artifacts
 clean:
-	rm -rf $(OBJ_DIR) test_*
+	rm -rf $(OBJ_DIR)
 
 # Run all tests
 test: test_fen

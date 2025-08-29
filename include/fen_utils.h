@@ -18,7 +18,7 @@ typedef struct {
 
 // SAN move representation (e.g., "e4", "Nf3", "O-O")
 typedef struct {
-    char notation[10];    // e.g., "e4", "Nf3", "O-O"
+    char notation[32];    // e.g., "e4", "Nf3", "O-O"
 } san_move;
 
 // Move struct with union to handle both UCI and SAN formats
@@ -69,6 +69,8 @@ bool string_to_int(const char *str, int *out);
 
 
 int get_move_numbers_from_pgn_string(const char *pgn_string);
+Move **get_moves_from_pgn_string(const char *pgn_string);
+Move *translate_san_to_uci(Move *san_move, FEN_Board *board);
 
 
 FEN_Board *create_fen_board(char *fen_string);

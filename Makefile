@@ -35,12 +35,15 @@ $(OBJ_DIR)/test_%: $(TEST_DIR)/%.c $(OBJ_FILES) | $(OBJ_DIR)
 test_fen: $(OBJ_DIR)/test_test_fen_board
 	./$(OBJ_DIR)/test_test_fen_board
 
+test_pgn_move_calculator: $(OBJ_DIR)/test_test_pgn_move_calculator
+	./$(OBJ_DIR)/test_test_pgn_move_calculator
+
 # Clean build artifacts
 clean:
 	rm -rf $(OBJ_DIR)
 
 # Run all tests
-test: test_fen
+test: test_fen test_pgn_move_calculator
 	@echo "All tests completed!"
 
-.PHONY: all clean test test_fen 
+.PHONY: all clean test test_fen test_pgn_move_calculator

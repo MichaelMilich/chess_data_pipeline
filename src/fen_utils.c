@@ -57,6 +57,20 @@ Move *get_move_from_uci(char *uci_move) {
     return move;
 }
 
+Move *get_move_from_san(char *san_move) {
+    Move *move = (Move *)malloc(sizeof(Move));
+    if (!move) return NULL;
+
+    move->type = "san";
+    move->player = '?';
+    size_t cap = sizeof(move->move_data.san.notation);
+
+    strncpy(move->move_data.san.notation, san_move, cap - 1);
+    move->move_data.san.notation[cap - 1] = '\0';
+
+    return move;
+}
+
 bool string_to_int(const char *str, int *out) {
     char *endptr;
     long val;
@@ -76,25 +90,59 @@ bool string_to_int(const char *str, int *out) {
     return true; // success
 }
 
-int get_move_numbers_from_pgn_string(const char *pgn_string){
-    if (pgn_string == NULL) {
-        return 0;
-    }
+int get_move_numbers_from_pgn_string(const char *pgn_string) {
+    if (!pgn_string) return 0;
 
     int move_count = 0;
-    const char *ptr = pgn_string;
+    const unsigned char *p = (const unsigned char *)pgn_string;
 
-    while (*ptr) {
-        if (!isdigit((unsigned char)*ptr) && *ptr != '.') {
-            move_count++;
-            while (*ptr && !isspace((unsigned char)*ptr)) {
-                ptr++;
-            }
+    while (*p != '\0') {
+        // 1) Skip move numbers, dots, and whitespace
+        while (*p != '\0' && (isdigit(*p) || *p == '.' || isspace(*p))) {
+            p++;
         }
-        ptr++;
+        if (*p == '\0') break;
+
+        // 2) At start of a SAN token -> count one move
+        move_count++;
+
+        // 3) Skip the token (non-space run)
+        while (*p != '\0' && !isspace(*p)) {
+            p++;
+        }
+        // loop continues; no extra p++ here
     }
 
     return move_count;
+}
+
+Move **get_moves_from_pgn_string(const char *pgn_string){
+    if (!pgn_string) return NULL;
+    
+    int move_count = get_move_numbers_from_pgn_string(pgn_string);
+    if (move_count == 0) return NULL;
+    Move **moves = (Move **)malloc(sizeof(Move *) * move_count);
+    if (!moves) return NULL;
+
+    // Make a copy of the PGN string since strtok modifies it
+    size_t pgn_size = strlen(pgn_string);
+    char pgn_copy[pgn_size + 1];
+    strncpy(pgn_copy, pgn_string, sizeof(pgn_copy) - 1);
+    pgn_copy[sizeof(pgn_copy) - 1] = '\0';
+
+    char *token = strtok(pgn_copy, " \t\r\n");
+    int move_index = 0;
+    while (token != NULL && move_index < move_count) {
+        if (isdigit(token[0]) || token[0] == '.') {
+            token = strtok(NULL, " \t\r\n");
+            continue; // Skip move numbers and dots
+        }
+        moves[move_index] = get_move_from_san(token);
+        move_index++;
+        token = strtok(NULL, " \t\r\n");
+    }
+
+    return moves;
 }
 
 /**

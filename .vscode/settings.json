@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "general_utils.h": "c",
-        "limits.h": "c"
+        "limits.h": "c",
+        "errno.h": "c"
     }
 }

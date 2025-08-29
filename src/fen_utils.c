@@ -324,3 +324,29 @@ FEN_Board *generate_starting_position_fen(void){
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     return create_fen_board(fen_string);
 }
+
+char *find_move_starting_position_of_piece(char piece, FEN_Board *board, char destination_square[2], char *starting_position){
+    // TODO: fill this function
+    return NULL;
+}
+
+bool translate_san_to_uci(Move *san_move, FEN_Board *board){
+    if (san_move == NULL || board == NULL) {
+        return false;
+    }
+    if (strcmp(san_move->type, "uci") == 0) {
+        return true; // Already in UCI format
+    }
+    if (strcmp(san_move->type, "san") != 0) {
+        return false; // not UCI and not SAN, something is wrong
+    }
+
+    uci_move uci;
+    size_t san_length = strlen(san_move->move_data.san.notation);
+    if( san_length==2){ // this happens only when we move a pawn to an empty square
+        strncmp(san_move->move_data.san.notation,uci.to_square, 2);
+        uci.to_square[2] = '\0';
+        char from_square[3];
+        find_move_starting_position_of_piece("p", board, uci.to_square, &from_square);
+    }
+}

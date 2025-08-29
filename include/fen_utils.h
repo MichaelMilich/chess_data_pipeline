@@ -70,12 +70,12 @@ bool string_to_int(const char *str, int *out);
 
 int get_move_numbers_from_pgn_string(const char *pgn_string);
 Move **get_moves_from_pgn_string(const char *pgn_string);
-Move *translate_san_to_uci(Move *san_move, FEN_Board *board);
-
 
 FEN_Board *create_fen_board(char *fen_string);
 bool fen_board_to_fen_string(FEN_Board *board, char *fen_string_out);
 bool free_fen_plus(FEN_Plus *fen_plus);
 FEN_Board *generate_starting_position_fen();
+
+bool translate_san_to_uci(Move *san_move, FEN_Board *board);
 
 #endif

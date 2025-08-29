@@ -43,78 +43,78 @@ void test_starting_position() {
     // Standard chess starting position FEN
     char *starting_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     
-    FEN_Board board;
-    bool success = create_fen_board(&board, starting_fen);
-    
-    assert(success == true);
+    FEN_Board *board;
+    board = create_fen_board(starting_fen);
+
+    assert(board != NULL);
     printf("✓ create_fen_board returned true\n");
     
     // Test side to move (should be white's turn)
-    assert(board.side_to_move == 0);
+    assert(board->side_to_move == 0);
     printf("✓ Side to move is correct (white's turn)\n");
     
     // Test castling rights (should be "KQkq")
-    assert(strcmp(board.castling_rights, "KQkq") == 0);
+    assert(strcmp(board->castling_rights, "KQkq") == 0);
     printf("✓ Castling rights are correct\n");
     
     // Test en passant square (should be none)
-    assert(board.en_passant_square_file == -1);
-    assert(board.en_passant_square_rank == -1);
+    assert(board->en_passant_square_file == -1);
+    assert(board->en_passant_square_rank == -1);
     printf("✓ En passant square is correct (none)\n");
     
     // Test halfmove clock (should be 0)
-    assert(board.halfmove_clock == 0);
+    assert(board->halfmove_clock == 0);
     printf("✓ Halfmove clock is correct\n");
     
     // Test fullmove number (should be 1)
-    assert(board.fullmove_number == 1);
+    assert(board->fullmove_number == 1);
     printf("✓ Fullmove number is correct\n");
     
     // Test specific board positions
     // White pieces on first rank
-    assert(board.board[0][0] == 'R'); // a1
-    assert(board.board[0][1] == 'N'); // b1
-    assert(board.board[0][2] == 'B'); // c1
-    assert(board.board[0][3] == 'Q'); // d1
-    assert(board.board[0][4] == 'K'); // e1
-    assert(board.board[0][5] == 'B'); // f1
-    assert(board.board[0][6] == 'N'); // g1
-    assert(board.board[0][7] == 'R'); // h1
+    assert(board->board[0][0] == 'R'); // a1
+    assert(board->board[0][1] == 'N'); // b1
+    assert(board->board[0][2] == 'B'); // c1
+    assert(board->board[0][3] == 'Q'); // d1
+    assert(board->board[0][4] == 'K'); // e1
+    assert(board->board[0][5] == 'B'); // f1
+    assert(board->board[0][6] == 'N'); // g1
+    assert(board->board[0][7] == 'R'); // h1
     printf("✓ White back rank pieces are correct\n");
     
     // White pawns on second rank
     for (int file = 0; file < 8; file++) {
-        assert(board.board[1][file] == 'P');
+        assert(board->board[1][file] == 'P');
     }
     printf("✓ White pawns are correct\n");
     
     // Empty squares in middle
     for (int rank = 2; rank < 6; rank++) {
         for (int file = 0; file < 8; file++) {
-            assert(board.board[rank][file] == ' ');
+            assert(board->board[rank][file] == ' ');
         }
     }
     printf("✓ Empty middle squares are correct\n");
     
     // Black pawns on seventh rank
     for (int file = 0; file < 8; file++) {
-        assert(board.board[6][file] == 'p');
+        assert(board->board[6][file] == 'p');
     }
     printf("✓ Black pawns are correct\n");
     
     // Black pieces on eighth rank
-    assert(board.board[7][0] == 'r'); // a8
-    assert(board.board[7][1] == 'n'); // b8
-    assert(board.board[7][2] == 'b'); // c8
-    assert(board.board[7][3] == 'q'); // d8
-    assert(board.board[7][4] == 'k'); // e8
-    assert(board.board[7][5] == 'b'); // f8
-    assert(board.board[7][6] == 'n'); // g8
-    assert(board.board[7][7] == 'r'); // h8
+    assert(board->board[7][0] == 'r'); // a8
+    assert(board->board[7][1] == 'n'); // b8
+    assert(board->board[7][2] == 'b'); // c8
+    assert(board->board[7][3] == 'q'); // d8
+    assert(board->board[7][4] == 'k'); // e8
+    assert(board->board[7][5] == 'b'); // f8
+    assert(board->board[7][6] == 'n'); // g8
+    assert(board->board[7][7] == 'r'); // h8
     printf("✓ Black back rank pieces are correct\n");
     
     // Print the structure for visual verification
-    print_fen_board(&board);
+    print_fen_board(board);
     
     printf("✓ All starting position tests passed!\n\n");
 }
@@ -126,30 +126,30 @@ void test_en_passant_position() {
     // Position after 1. e4 e5 2. f4 h6 3. f5 g5
     char *en_passant_fen = "rnbqkbnr/pppp1p2/7p/4pPp1/4P3/8/PPPP2PP/RNBQKBNR w KQkq g6 0 4";
     
-    FEN_Board board;
-    bool success = create_fen_board(&board, en_passant_fen);
-    
-    assert(success == true);
+    FEN_Board *board;
+    board = create_fen_board(en_passant_fen);
+
+    assert(board != NULL);
     printf("✓ create_fen_board returned true\n");
     
     // Test side to move (should be white's turn)
-    assert(board.side_to_move == 0);
+    assert(board->side_to_move == 0);
     printf("✓ Side to move is correct (white's turn)\n");
     
     // Test en passant square (should be g6)
-    assert(board.en_passant_square_file == 6); // g = 6 (0=a, 1=b, 2=c, 3=d)
-    assert(board.en_passant_square_rank == 5); // 6 = 5 (0=1, 1=2, ..., 5=6)
+    assert(board->en_passant_square_file == 6); // g = 6 (0=a, 1=b, 2=c, 3=d)
+    assert(board->en_passant_square_rank == 5); // 6 = 5 (0=1, 1=2, ..., 5=6)
     printf("✓ En passant square is correct (g6)\n");
     
     // Test fullmove number (should be 4)
-    assert(board.fullmove_number == 4);
+    assert(board->fullmove_number == 4);
     printf("✓ Fullmove number is correct\n");
     
     // Test specific board positions
-    assert(board.board[5][6] == ' '); // g6 is empty and can be captured by a pawn
+    assert(board->board[5][6] == ' '); // g6 is empty and can be captured by a pawn
     printf("✓ En passant position is correct\n");
     
-    print_fen_board(&board);
+    print_fen_board(board);
     
     printf("✓ All en passant tests passed!\n\n");
 }
@@ -161,18 +161,19 @@ void test_castling_rights() {
     // Position where white rook has moved
     char *no_castling_fen = "rnbqkbnr/pppp1ppp/4p3/8/8/5N2/PPPPPPPP/RNBQKBR1 b Qkq - 1 2";
     
-    FEN_Board board;
-    bool success = create_fen_board(&board, no_castling_fen);
-    
-    assert(success == true);
+
+    FEN_Board *board;
+    board = create_fen_board(no_castling_fen);
+
+    assert(board != NULL);
     printf("✓ create_fen_board returned true\n");
     
     // Test castling rights (should be "Qkq" - no white kingside castling)
-    assert(strcmp(board.castling_rights, "Qkq") == 0);
+    assert(strcmp(board->castling_rights, "Qkq") == 0);
     printf("✓ Castling rights are correct (no white kingside)\n");
-    
-    print_fen_board(&board);
-    
+
+    print_fen_board(board);
+
     printf("✓ All castling rights tests passed!\n\n");
 }
 
@@ -182,21 +183,21 @@ void test_fen_conversion() {
     // Position after 1. e4 e5 2. f4 h6 3. f5 g5
     char *en_passant_fen = "rnbqkbnr/pppp1p2/7p/4pPp1/4P3/8/PPPP2PP/RNBQKBNR w KQkq g6 0 4";
 
-    FEN_Board board;
-    bool success = create_fen_board(&board, en_passant_fen);
+    FEN_Board *board;
+    board = create_fen_board(en_passant_fen);
 
-    assert(success == true);
+    assert(board != NULL);
     printf("✓ create_fen_board returned true\n");
 
     char fen_out[200];
-    success = fen_board_to_fen_string(&board, fen_out);
+    bool success = fen_board_to_fen_string(board, fen_out);
 
     assert(success == true);
     assert(strcmp(en_passant_fen, fen_out) == 0);
     printf("✓ output = %s\n", fen_out);
     printf("✓ FEN conversion is correct\n");
 
-    print_fen_board(&board);
+    print_fen_board(board);
 }
 
 int main() {

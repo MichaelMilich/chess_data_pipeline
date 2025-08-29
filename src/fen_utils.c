@@ -2,6 +2,101 @@
 #include "fen_utils.h"
 
 
+char *get_termination_string(enum Termination termination) {
+    switch (termination) {
+        case NORMAL:
+            return "Normal";
+        case TIME_FORFEIT:
+            return "Time forfeit";
+        case ABANDONED:
+            return "Abandoned";
+        default:
+            return "Unknown";
+    }
+}
+
+char *get_game_result_string(enum GameResult game_result) {
+    switch (game_result) {
+        case WHITE_WINS:
+            return "1-0";
+        case BLACK_WINS:
+            return "0-1";
+        case DRAW:
+            return "1/2-1/2";
+        default:
+            return "*";
+    }
+}
+
+
+Move *get_move_from_uci(char *uci_move) {
+    Move *move = (Move *)malloc(sizeof(Move));
+    if (!move) return NULL;
+
+    move->type = "uci";
+    size_t len = strlen(uci_move);
+    if (len != 4 && len != 5) {
+        printf("Invalid UCI move: %s\n", uci_move);
+        free(move);
+        return NULL;
+    }
+
+    strncpy(move->move_data.uci.from_square, uci_move, 2);
+    move->move_data.uci.from_square[2] = '\0';
+
+    strncpy(move->move_data.uci.to_square, uci_move + 2, 2);
+    move->move_data.uci.to_square[2] = '\0';
+
+    if (len == 5) {
+        strncpy(move->move_data.uci.promotion, uci_move + 4, 1);
+        move->move_data.uci.promotion[1] = '\0';
+    } else {
+        move->move_data.uci.promotion[0] = '\0';  // No promotion
+    }
+
+    return move;
+}
+
+bool string_to_int(const char *str, int *out) {
+    char *endptr;
+    long val;
+
+    errno = 0; // reset errno before call
+    val = strtol(str, &endptr, 10); // base 10
+
+    // Check for conversion errors
+    if (errno == ERANGE || val > INT_MAX || val < INT_MIN) {
+        return false; // out of int range
+    }
+    if (endptr == str || *endptr != '\0') {
+        return false; // no digits converted or leftover characters
+    }
+
+    *out = (int)val;
+    return true; // success
+}
+
+int get_move_numbers_from_pgn_string(const char *pgn_string){
+    if (pgn_string == NULL) {
+        return 0;
+    }
+
+    int move_count = 0;
+    const char *ptr = pgn_string;
+
+    while (*ptr) {
+        if (!isdigit((unsigned char)*ptr) && *ptr != '.') {
+            move_count++;
+            while (*ptr && !isspace((unsigned char)*ptr)) {
+                ptr++;
+            }
+        }
+        ptr++;
+    }
+
+    return move_count;
+}
+
 /**
  * @brief Parses a FEN (Forsyth–Edwards Notation) string and fills a FEN_Board struct.
  *
@@ -17,13 +112,13 @@
  * the function returns false. If output is NULL, the function will allocate memory for it,
  * but the caller is responsible for freeing it.
  */
-bool create_fen_board(FEN_Board *output, char *fen_string) {
+FEN_Board *create_fen_board(char *fen_string) {
     if (fen_string == NULL) {
-        return false;
+        return NULL;
     }
+    FEN_Board *output = (FEN_Board *)malloc(sizeof(FEN_Board));
     if (output == NULL) {
-        output = (FEN_Board *)malloc(sizeof(FEN_Board));
-        if (output == NULL) return false;
+        return NULL;
     }
     
     // Initialize board with empty squares
@@ -46,7 +141,8 @@ bool create_fen_board(FEN_Board *output, char *fen_string) {
     char *fullmove = strtok(NULL, " ");         // "1"
     
     if (!board_part || !side || !castling || !en_passant || !halfmove || !fullmove) {
-        return false;
+        free(output);
+        return NULL;
     }
     
     // Parse the board part
@@ -91,10 +187,11 @@ bool create_fen_board(FEN_Board *output, char *fen_string) {
     bool fullmove_convert_success = string_to_int(fullmove, &output->fullmove_number);
     
     if (!halfmove_convert_success || !fullmove_convert_success) {
-        return false;
+        free(output);
+        return NULL;
     }
-    
-    return true;
+
+    return output;
 }
 
 /**
@@ -156,4 +253,26 @@ bool fen_board_to_fen_string(FEN_Board *board, char *fen_string_out){
             board->halfmove_clock, board->fullmove_number);
 
     return true;
+}
+
+bool free_fen_plus(FEN_Plus *fen_plus){
+    if (fen_plus == NULL) {
+        return false;
+    }
+    if (fen_plus->board != NULL) {
+        free(fen_plus->board);
+    }
+    if (fen_plus->move != NULL) {
+        free(fen_plus->move);
+    }
+    free(fen_plus);
+    return true;
+}
+
+
+
+FEN_Board *generate_starting_position_fen(void){
+    char *fen_string =
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    return create_fen_board(fen_string);
 }

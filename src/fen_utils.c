@@ -325,8 +325,9 @@ FEN_Board *generate_starting_position_fen(void){
     return create_fen_board(fen_string);
 }
 
-char *find_move_starting_position_of_piece(char piece, FEN_Board *board, char destination_square[2], char *starting_position){
+char *find_move_starting_position_of_piece(char piece, FEN_Board *board, char destination_square[3], char *starting_position){
     // TODO: fill this function
+    
     return NULL;
 }
 

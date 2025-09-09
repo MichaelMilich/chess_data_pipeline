@@ -59,6 +59,9 @@ class AbstractPiece:
     def __str__(self):
         return f"{self.color} {self.type}"
 
+    def __eq__(self, other):
+        return self.color == other.color and self.type == other.type and self.position == other.position
+
 class Pawn(AbstractPiece):
     def __init__(self, color: str, position: Position = None):
         super().__init__(color, "Pawn", position)
@@ -75,6 +78,12 @@ class Pawn(AbstractPiece):
         elif (0,-2) in self._moveset:
             self._moveset.remove( (0,-2) )
         return super().get_moveset()
+    
+    def __str__(self):
+        return "P" if self.color == "white" else "p"
+
+    def __repr__(self):
+        return self.__str__()
 
 class Knight(AbstractPiece):
     def __init__(self, color: str, position: Position = None):
@@ -88,6 +97,12 @@ class Knight(AbstractPiece):
     def get_attack_moveset(self):
         return self.get_moveset()
 
+    def __str__(self):
+        return "N" if self.color == "white" else "n"
+
+    def __repr__(self):
+        return self.__str__()
+
 class Bishop(AbstractPiece):
     def __init__(self, color: str, position: Position = None):
         super().__init__(color, "Bishop", position)
@@ -98,6 +113,12 @@ class Bishop(AbstractPiece):
     def get_attack_moveset(self):
         return self.get_moveset()
 
+    def __str__(self):
+        return "B" if self.color == "white" else "b"
+
+    def __repr__(self):
+        return self.__str__()
+
 class Rook(AbstractPiece):
     def __init__(self, color: str, position: Position = None):
         super().__init__(color, "Rook", position)
@@ -107,6 +128,12 @@ class Rook(AbstractPiece):
 
     def get_attack_moveset(self):
         return self.get_moveset()
+
+    def __str__(self):
+        return "R" if self.color == "white" else "r"
+
+    def __repr__(self):
+        return self.__str__()
 
 class Queen(AbstractPiece):
     def __init__(self, color: str, position: Position = None):
@@ -120,6 +147,12 @@ class Queen(AbstractPiece):
     def get_attack_moveset(self):
         return self.get_moveset()
 
+    def __str__(self):
+        return "Q" if self.color == "white" else "q"
+
+    def __repr__(self):
+        return self.__str__()
+
 class King(AbstractPiece):
     def __init__(self, color: str, position: Position = None):
         super().__init__(color, "King", position)
@@ -129,3 +162,25 @@ class King(AbstractPiece):
 
     def get_attack_moveset(self):
         return self.get_moveset()
+
+    def __str__(self):
+        return "K" if self.color == "white" else "k"
+
+    def __repr__(self):
+        return self.__str__()
+
+def get_piece_from_char(char: str, position_string: str):
+    char_lower = char.lower()
+    is_white = char.isupper()
+    if char_lower == "p":
+        return Pawn(color="white" if is_white else "black", position=Position.from_string(position_string))
+    elif char_lower == "n":
+        return Knight(color="white" if is_white else "black", position=Position.from_string(position_string))
+    elif char_lower == "b":
+        return Bishop(color="white" if is_white else "black", position=Position.from_string(position_string))
+    elif char_lower == "r":
+        return Rook(color="white" if is_white else "black", position=Position.from_string(position_string))
+    elif char_lower == "q":
+        return Queen(color="white" if is_white else "black", position=Position.from_string(position_string))
+    elif char_lower == "k":
+        return King(color="white" if is_white else "black", position=Position.from_string(position_string))

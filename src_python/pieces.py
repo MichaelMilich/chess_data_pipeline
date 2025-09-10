@@ -1,4 +1,5 @@
 class Position:
+    # a comment from my steam deck
     FILE_NAMES = "abcdefgh"
     def __init__(self, file: int, rank: int):
         assert file >= 1 and file <= 8

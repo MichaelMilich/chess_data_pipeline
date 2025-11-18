@@ -30,32 +30,29 @@ class AbstractPiece:
         self._moveset = set()
         self._attack_moveset = set()
 
-    def get_moveset(self):
-        if self.position is None:
-            return Exception("Piece has no position")
-        final_moveset = set()
-        for move in self._moveset:
-            if self.position.file + move[0] <1 or self.position.file + move[0] >8:
-                continue
-            if self.position.rank + move[1] <1 or self.position.rank + move[1] >8:
-                continue
-            final_moveset.add( Position(self.position.file + move[0], self.position.rank + move[1]) )
-        return final_moveset
-
-    def get_attack_moveset(self):
-        if self.position is None:
-            return Exception("Piece has no position")
-        final_moveset = set()
-        for move in self._attack_moveset:
-            if self.position.file + move[0] <1 or self.position.file + move[0] >8:
-                continue
-            if self.position.rank + move[1] <1 or self.position.rank + move[1] >8:
-                continue
-            final_moveset.add( Position(self.position.file + move[0], self.position.rank + move[1]) )
-        return final_moveset
+    @property
+    def attack_moveset(self):
+        self._moves_within_board(self._attack_moveset)
     
-    def get_all_moveset(self):
-        return self.get_moveset().union(self.get_attack_moveset())
+    @property
+    def general_moveset(self):
+        self._moves_within_board(self._moveset)
+    
+    @property
+    def all_moves(self):
+        return self.general_moveset.union(self.attack_moveset)
+    
+    def _moves_within_board(self,moveset):
+        if self.position is None:
+            return set()
+        final_moveset = set()
+        for move in moveset:
+            if self.position.file + move[0] <1 or self.position.file + move[0] >8:
+                continue
+            if self.position.rank + move[1] <1 or self.position.rank + move[1] >8:
+                continue
+            final_moveset.add( Position(self.position.file + move[0], self.position.rank + move[1]) )
+        return final_moveset
 
     def __str__(self):
         return f"{self.color} {self.type}"
@@ -70,7 +67,8 @@ class Pawn(AbstractPiece):
         self._attack_moveset.add( (1,1) if self.color == "white" else (-1,-1) )
         self._attack_moveset.add( (-1,1) if self.color == "white" else (1,-1) )
 
-    def get_moveset(self):
+    @property
+    def general_moveset(self):
         starting_rank = 2 if self.color == "white" else 7
         if self.position.rank == starting_rank:
             self._moveset.add( (0,2) if self.color == "white" else (0,-2) )
@@ -78,7 +76,7 @@ class Pawn(AbstractPiece):
             self._moveset.remove( (0,2) )
         elif (0,-2) in self._moveset:
             self._moveset.remove( (0,-2) )
-        return super().get_moveset()
+        return super().general_moveset
     
     def __str__(self):
         return "P" if self.color == "white" else "p"
@@ -95,8 +93,9 @@ class Knight(AbstractPiece):
                     continue
                 self._moveset.add( (file,rank) )
 
-    def get_attack_moveset(self):
-        return self.get_moveset()
+    @property
+    def attack_moveset(self):
+        return self.general_moveset
 
     def __str__(self):
         return "N" if self.color == "white" else "n"
@@ -111,9 +110,10 @@ class Bishop(AbstractPiece):
             self._moveset.add( (i,i) )
             self._moveset.add( (i,-i) )
 
-    def get_attack_moveset(self):
-        return self.get_moveset()
-
+    @property
+    def attack_moveset(self):
+        return self.general_moveset
+    
     def __str__(self):
         return "B" if self.color == "white" else "b"
 
@@ -127,8 +127,9 @@ class Rook(AbstractPiece):
             self._moveset.add( (i,0) )
             self._moveset.add( (0,i) )
 
-    def get_attack_moveset(self):
-        return self.get_moveset()
+    @property
+    def attack_moveset(self):
+        return self.general_moveset
 
     def __str__(self):
         return "R" if self.color == "white" else "r"
@@ -145,8 +146,9 @@ class Queen(AbstractPiece):
             self._moveset.add( (i,0) )
             self._moveset.add( (0,i) )
 
-    def get_attack_moveset(self):
-        return self.get_moveset()
+    @property
+    def attack_moveset(self):
+        return self.general_moveset
 
     def __str__(self):
         return "Q" if self.color == "white" else "q"
@@ -161,8 +163,9 @@ class King(AbstractPiece):
             for j in range(-1,2):
                 self._moveset.add( (i,j) )
 
-    def get_attack_moveset(self):
-        return self.get_moveset()
+    @property
+    def attack_moveset(self):
+        return self.general_moveset
 
     def __str__(self):
         return "K" if self.color == "white" else "k"

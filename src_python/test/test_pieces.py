@@ -1,4 +1,4 @@
-import pieces
+import src_python.pieces as pieces
 import unittest
 
 class TestPieces(unittest.TestCase):

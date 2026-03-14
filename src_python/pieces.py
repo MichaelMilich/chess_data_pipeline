@@ -1,9 +1,27 @@
+from enum import Enum
+
+
+class Color(str, Enum):
+    WHITE = "white"
+    BLACK = "black"
+
+
+def get_color_from_string(color_string: str) -> Color:
+    normalized_color = color_string.strip().lower()
+    if normalized_color in {"white", "w"}:
+        return Color.WHITE
+    if normalized_color in {"black", "b"}:
+        return Color.BLACK
+    raise ValueError(f"Unsupported color string: {color_string}")
+
+
 class Position:
-    # a comment from my steam deck
     FILE_NAMES = "abcdefgh"
-    def __init__(self, file: int, rank: int):
-        assert file >= 1 and file <= 8
-        assert rank >= 1 and rank <= 8
+    def __init__(self, file: int, rank: int, real_position: bool = True):
+        self.real_position = real_position
+        if real_position:
+            assert file >= 1 and file <= 8
+            assert rank >= 1 and rank <= 8
         self.file = file
         self.rank = rank
     
@@ -20,6 +38,10 @@ class Position:
         file = cls.FILE_NAMES.index(position_string[0]) + 1
         rank = int(position_string[1])
         return cls(file, rank)
+    
+class VirtualPosition(Position):
+    def __init__(self, file: int = -1, rank: int = -1):
+        super().__init__(file, rank, real_position=False)
 
 
 class AbstractPiece:
@@ -177,14 +199,14 @@ def get_piece_from_char(char: str, position_string: str):
     char_lower = char.lower()
     is_white = char.isupper()
     if char_lower == "p":
-        return Pawn(color="white" if is_white else "black", position=Position.from_string(position_string))
+        return Pawn(color=get_color_from_string("white" if is_white else "black"), position=Position.from_string(position_string))
     elif char_lower == "n":
-        return Knight(color="white" if is_white else "black", position=Position.from_string(position_string))
+        return Knight(color=get_color_from_string("white" if is_white else "black"), position=Position.from_string(position_string))
     elif char_lower == "b":
-        return Bishop(color="white" if is_white else "black", position=Position.from_string(position_string))
+        return Bishop(color=get_color_from_string("white" if is_white else "black"), position=Position.from_string(position_string))
     elif char_lower == "r":
-        return Rook(color="white" if is_white else "black", position=Position.from_string(position_string))
+        return Rook(color=get_color_from_string("white" if is_white else "black"), position=Position.from_string(position_string))
     elif char_lower == "q":
-        return Queen(color="white" if is_white else "black", position=Position.from_string(position_string))
+        return Queen(color=get_color_from_string("white" if is_white else "black"), position=Position.from_string(position_string))
     elif char_lower == "k":
-        return King(color="white" if is_white else "black", position=Position.from_string(position_string))
+        return King(color=get_color_from_string("white" if is_white else "black"), position=Position.from_string(position_string))

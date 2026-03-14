@@ -1,45 +1,95 @@
 # Chess Data Pipeline
 
 ## Overview
-This project is part of a larger personal project to build a chess engine using C, C++, and Machine Learning.  
-The goal of this module is to process the Lichess game database (in `.pgn.zst` format) and transform it into a machine-learning-friendly CSV format.
+This repository is part of a larger personal project to build a chess engine using C, C++, and machine learning.
 
-## Purpose
-Extract relevant training data for a machine learning model that predicts chess moves.  
-The CSV format, referred to as **FEN+**, will include one row per move and contain:
+The goal of this module is to process Lichess game data from `.pgn.zst` files and convert it into a machine-learning-friendly CSV dataset.
 
-- **Time Format** - String representing the game time limit and if there are any increments. (e.g. `10` for 10 minutes or `10+3` for a 10 minute game where each move buys 3 more seconds to the clock)
-- **Move Number** — integer indicating which move in the game this is.
-- **FEN** — board state before the move (standard Forsyth–Edwards Notation).
-- **ELO** — Lichess rating of the player who made the move.
-- **Next Move** — the move taken from the FEN position, represented in **UCI** notation (e.g. `e2e4`).
+## Goal
+The intended dataset format, referred to here as **FEN+**, has one row per move and is designed for training a model that predicts chess moves from positions.
+
+Each row is intended to contain:
+
+- **Time Format**: the game time control, for example `10` or `10+3`
+- **Move Number**: the move number within the game
+- **FEN**: the board state before the move in Forsyth-Edwards Notation
+- **ELO**: the Lichess rating of the player making the move
+- **Next Move**: the move played from that position in UCI notation, for example `e2e4`
+
+Example output row:
+
+```csv
+time_format,move_number,fen,elo,uci_move
+10+3,1,rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1,1650,e2e4
+```
+
+## Current Status
+This project is still in an early implementation stage.
+
+Implemented today:
+
+- FEN parsing in C
+- FEN serialization in C
+- Basic extraction of SAN move tokens from simple PGN move strings
+- Unit tests for the current C parsing utilities
+- Early Python prototypes for board and piece modeling
+
+Not implemented yet:
+
+- Streaming and processing real `.pgn.zst` Lichess dumps
+- Robust PGN parsing for full real-world game records
+- SAN-to-UCI conversion
+- End-to-end CSV export for the target dataset
+
+## Development Approach
+Part of the purpose of this project is to build experience with C by implementing the final pipeline in C.
+
+The `src_python/` directory contains prototype code used to explore ideas more quickly in Python before rewriting stable logic in C.
 
 ## Input
-- File format: `.pgn.zst` (Lichess compressed PGN dump)
-- Each file contains multiple games in PGN format.
+- Lichess game dumps in `.pgn.zst` format
+- PGN game records containing move text and metadata
 
-## Output
-- CSV file containing rows in the format: time_format,move_number,fen,elo,uci_move
+## Intended Output
+- CSV rows in the format `time_format,move_number,fen,elo,uci_move`
 
-## Project Structure
+## Repository Structure
+```text
 chess_data_pipeline/
-├── src/ # Core C source files
-├── include/ # Header files
-├── lichess_database/ # Input PGN and output CSV files, the whole directory is in gitignore
-├── scripts/ # Helper scripts (decompression, test runners, etc.)
-├── README.md # Project description and goals
-├── .cursor-config.json # Custom config for Cursor context
-└── Makefile # Build system
+├── include/                 # C header files
+├── src/                     # C source files
+├── src_python/              # Python prototypes and experiments
+├── test/                    # C test programs
+├── src_python/test/         # Python tests and PGN test artifacts
+├── README.md                # Project overview and goals
+├── .cursor-config.json      # Local editor/agent configuration
+└── Makefile                 # Build and test commands
+```
+
+## Build and Test
+Current development is centered on the C utilities and tests.
+
+Requirements:
+
+- `gcc`
+- `make`
+- `libzstd`
+
+Run the test suite with:
+
+```sh
+make test
+```
+
+This currently builds and runs the C test programs in `test/`.
 
 ## Dependencies
-- `libzstd`: for reading `.zst` files inline
+- `libzstd` for future `.zst` file support
 
-## Development Goals
-- 🚧 Efficient streaming of large `.zst` files without full decompression
-- 🚧 Accurate PGN parsing
-- 🚧 Clean and modular C implementation
-- 🚧 FEN state generator
-- 🚧 CSV writer with UCI move annotations
-- 🚧 Unit tests and benchmarks
-
+## Roadmap
+- Efficient streaming of large `.zst` files without full decompression
+- Accurate PGN parsing
+- SAN-to-UCI move translation
+- CSV writer for the FEN+ dataset
+- Additional unit tests and benchmarks
 

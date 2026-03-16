@@ -1,4 +1,5 @@
 from enum import Enum
+from itertools import count
 
 
 class Color(str, Enum):
@@ -45,12 +46,22 @@ class VirtualPosition(Position):
 
 
 class AbstractPiece:
+    _id_counter = count(1)
+
     def __init__(self, color: str, type: str, position: Position = None):
         self.color = color
         self.type = type
         self.position = position
         self._moveset = set()
         self._attack_moveset = set()
+        identity_position = "none" if position is None else str(position)
+        self.piece_id = f"{self.color}_{self.type}_{identity_position}_{next(self._id_counter)}"
+
+    def __hash__(self):
+        return hash(self.piece_id)
+
+    def __eq__(self, other):
+        return isinstance(other, AbstractPiece) and self.piece_id == other.piece_id
 
     @property
     def attack_moveset(self):
@@ -78,9 +89,6 @@ class AbstractPiece:
 
     def __str__(self):
         return f"{self.color} {self.type}"
-
-    def __eq__(self, other):
-        return self.color == other.color and self.type == other.type and self.position == other.position
 
 class Pawn(AbstractPiece):
     def __init__(self, color: str, position: Position = None):

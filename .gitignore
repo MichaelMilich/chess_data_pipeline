@@ -1,3 +1,4 @@
 lichess_database/*
 obj/*
 src_python/__pycache__/*
+src_python/test/__pycache__/*
